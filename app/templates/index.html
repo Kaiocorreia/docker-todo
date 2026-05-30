@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tarefas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 32px;
+      width: 100%;
+      max-width: 560px;
+      height: fit-content;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+    }
+
+    .add-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .add-form input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .add-form input:focus { border-color: #4f46e5; }
+
+    .btn-add {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-add:hover { background: #4338ca; }
+
+    .task-count {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    .task-list { list-style: none; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .task-item:last-child { border-bottom: none; }
+
+    .task-title {
+      flex: 1;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .task-title.done {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+
+    .btn-toggle {
+      background: none;
+      border: 2px solid #4f46e5;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      color: #4f46e5;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-toggle:hover { background: #4f46e5; color: white; }
+
+    .btn-toggle.done-btn {
+      border-color: #10b981;
+      color: #10b981;
+    }
+
+    .btn-toggle.done-btn:hover { background: #10b981; color: white; }
+
+    .btn-delete {
+      background: none;
+      border: 2px solid #ef4444;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      color: #ef4444;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:hover { background: #ef4444; color: white; }
+
+    .empty {
+      text-align: center;
+      color: #bbb;
+      font-size: 1rem;
+      padding: 32px 0;
+    }
+
+    .badge {
+      background: #4f46e5;
+      color: white;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Lista de Tarefas <span class="badge">{{ tasks|length }}</span></h1>
+    <p class="subtitle">Sistemas Distribuidos &mdash; Trabalho Docker</p>
+
+    <form class="add-form" action="/add" method="POST">
+      <input type="text" name="title" placeholder="Nova tarefa..." required autocomplete="off">
+      <button class="btn-add" type="submit">Adicionar</button>
+    </form>
+
+    {% if tasks %}
+      <p class="task-count">
+        {{ tasks|selectattr('2')|list|length }} de {{ tasks|length }} concluidas
+      </p>
+      <ul class="task-list">
+        {% for task in tasks %}
+          <li class="task-item">
+            <span class="task-title {% if task[2] %}done{% endif %}">{{ task[1] }}</span>
+            <form action="/toggle/{{ task[0] }}" method="POST" style="display:inline">
+              <button class="btn-toggle {% if task[2] %}done-btn{% endif %}" type="submit">
+                {% if task[2] %}Desfazer{% else %}Concluir{% endif %}
+              </button>
+            </form>
+            <form action="/delete/{{ task[0] }}" method="POST" style="display:inline">
+              <button class="btn-delete" type="submit">Excluir</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">Nenhuma tarefa ainda. Adicione uma acima!</p>
+    {% endif %}
+  </div>
+</body>
+</html>
